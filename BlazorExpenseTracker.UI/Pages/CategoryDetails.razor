@@ -1,0 +1,72 @@
+﻿@page "/categorydetails"
+@page "/categorydetails/{id:int}"
+@using Model
+@using BlazorExpenseTracker.UI.Interfaces
+@inject ICategoryService CategoryService
+@inject NavigationManager NavigationManager
+
+<div class="modal" tabindex="-1" style="display:block" role="dialog">
+    
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Category Details </h3>
+            </div>
+
+            <div class="modal-content">
+                <EditForm Model="@category" OnValidSubmit="SaveCategory">
+                    <DataAnnotationsValidator />
+                    @* <ValidationSummary/> *@
+                    <table class="table">
+                        <tr>
+                            <td>Name</td>
+                            <td><input type="text" @bind="category.Name" /></td>
+                        </tr>
+                        <tr><td colspan="2"><ValidationMessage For="@(()=>category.Name)" /></td></tr>
+                        <tr>
+                            <td colspan="2" style="text-align:center">
+                                <input type="submit" value="Save" />
+                                <input type="button" value="Cancel" @onclick=Cancel />
+                            </td>
+                        </tr>
+                    </table>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+        
+
+        
+</div>
+
+
+@code{
+    [Parameter]
+    public int id { get; set; }
+    Category category = new Category();
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (id > 0)
+        {
+            category = await CategoryService.GetCategoryDetails(id);
+        }
+
+    }
+
+    protected async void SaveCategory()
+    {
+        await CategoryService.SaveCategory(category);
+        NavigateToCategories();
+    }
+
+    public void Cancel()
+    {
+        NavigateToCategories();
+    }
+
+    public void NavigateToCategories()
+    {
+        NavigationManager.NavigateTo("/categories");
+    }
+
+}
